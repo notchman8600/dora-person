@@ -40,7 +40,7 @@ class DoraRouter:
 
     def __init__(self, dora_controller: DoraController) -> None:
         self.dora_router = APIRouter(prefix="", tags=["dora"])
-        self.templates = Jinja2Templates(directory="templates")
+        self.templates = Jinja2Templates(directory="dora_person/templates")
         self.dora_controller = dora_controller
         self.__init_route()
 
