@@ -1,21 +1,20 @@
 # Standard Library
 import os
-from controller import DoraController
 
 # Third Party Library
 from fastapi import FastAPI
-from fastapi.security import OAuth2AuthorizationCodeBearer
 from fastapi.staticfiles import StaticFiles
-from fastapi_login import LoginManager
-from router import DoraRouter
-from starlette.responses import RedirectResponse
+
+# First Party Library
+from dora_person.controller import DoraController
+from dora_person.router import DoraRouter
 
 SECRET = os.environ.get("SECRET_DORA", "I_LIKE_GASOLINE_VERY_WELL")
 app = FastAPI()
 # 静的ファイルのパスを指定する
 app.mount(
     "/static",
-    StaticFiles(directory="static"),
+    StaticFiles(directory="dora_person/static"),
     name="static",
 )
 

@@ -3,7 +3,6 @@ import os
 
 # Third Party Library
 import httpx
-from controller import DoraController
 from fastapi import Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.routing import APIRouter
@@ -11,6 +10,9 @@ from fastapi.security import OAuth2AuthorizationCodeBearer, OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from fastapi_login import LoginManager
 from jwt import PyJWTError, decode, encode
+
+# First Party Library
+from dora_person.controller import DoraController
 
 oauth_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl="https://github.com/login/oauth/authorize",
@@ -37,7 +39,7 @@ class DoraRouter:
     manager: LoginManager
 
     def __init__(self, dora_controller: DoraController) -> None:
-        self.dora_router = APIRouter(prefix="/", tags=["dora"])
+        self.dora_router = APIRouter(prefix="", tags=["dora"])
         self.templates = Jinja2Templates(directory="templates")
         self.dora_controller = dora_controller
         self.__init_route()
@@ -63,7 +65,7 @@ class DoraRouter:
         # トップページ
         @self.dora_router.get("/")
         async def render_index_page(request: Request):
-            return self.templates.TemplateResponse("index.html", {"request": request, "title": "Dora"})
+            return self.templates.TemplateResponse("index.jinja2.html", {"request": request, "title": "Dora"})
 
         @self.dora_router.get("/login")
         def login(request: Request):
@@ -71,7 +73,7 @@ class DoraRouter:
             return RedirectResponse(url=github_oauth_url)
 
         @self.dora_router.get("/auth")
-        async def auth(code: str = "", request: Request = Depends()):
+        async def auth(request: Request, code: str = ""):
             if code == "":
                 raise HTTPException(status_code=401, detail="Unauthorized")
             data = {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET, "code": code}
