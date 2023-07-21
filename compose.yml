@@ -7,11 +7,9 @@ services:
     volumes:
       - ./dora_person:/usr/src/app/dora_person
       - socket:/var/tmp
-
     depends_on:
       redis:
         condition: service_started
-
   redis:
     image: "redis:alpine"
   web:
