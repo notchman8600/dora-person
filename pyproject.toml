@@ -1,0 +1,74 @@
+[tool.poetry]
+authors = ["notch_man <miyake.kentaro0815@mokkuriko.com>"]
+description = ""
+name = "dora-person"
+readme = "README.md"
+version = "0.1.0"
+
+[tool.mypy]
+# エラー時のメッセージを詳細表示
+show_error_context = true
+# エラー発生箇所の行数/列数を表示
+show_column_numbers = true
+# import 先のチェックを行わない (デフォルトだとサードパーティーライブラリまでチェックする)
+ignore_missing_imports = true
+# 関数定義の引数/戻り値に型アノテーション必須
+disallow_untyped_defs = true
+# デフォルト引数に None を取る場合型アノテーションに Optional 必須
+no_implicit_optional = true
+# 戻り値が Any 型ではない関数の戻り値の型アノテーションが Any のとき警告
+warn_return_any = true
+# mypy エラーに該当しない箇所に `# type: ignore` コメントが付与されていたら警告
+# ※ `# type: ignore` が付与されている箇所は mypy のエラーを無視出来る
+warn_unused_ignores = true
+# 冗長なキャストに警告
+warn_redundant_casts = true
+
+[tool.black]
+line-length = 128
+
+[tool.isort]
+import_heading_firstparty = "First Party Library"
+import_heading_localfolder = "Local Library"
+import_heading_stdlib = "Standard Library"
+import_heading_thirdparty = "Third Party Library"
+include_trailing_comma = true
+line_length = 128
+multi_line_output = 3
+profile = "black"
+
+[tool.flake8]
+exclude = [".venv", ".git", "__pycache__"]
+extend-ignore = ["E203", "W503"]
+max-complexity = 10
+max-line-length = 128
+
+[tool.poetry.dependencies]
+fastapi = "^0.100.0"
+fastapi-login = "^1.9.0"
+httpx = "^0.24.1"
+hypercorn = "^0.14.4"
+jinja2 = "^3.1.2"
+pyjwt = "^2.7.0"
+python = "^3.11"
+redis = "^4.6.0"
+mysql-connector-python = "^8.1.0"
+python-multipart = "^0.0.6"
+
+[tool.poetry.group.dev.dependencies]
+autoflake = "^2.1.1"
+black = "^23.1.0"
+flake8 = "^6.0.0"
+flake8-bugbear = "^23.2.13"
+flake8-builtins = "^2.1.0"
+flake8-isort = "^6.0.0"
+flake8-pytest-style = "^1.7.2"
+flake8-unused-arguments = "^0.0.13"
+isort = "^5.12.0"
+mypy = "^1.0.1"
+pep8-naming = "^0.13.3"
+pyproject-flake8 = "^6.0.0.post1"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
