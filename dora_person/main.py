@@ -41,7 +41,7 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
     if exc.status_code == status.HTTP_401_UNAUTHORIZED:
         return RedirectResponse(url="/login")
     return templates.TemplateResponse(
-        "error.jinja2.html", {"request": request, "status_code": 500, "detail": exc.args}, status_code=500
+        "error.jinja2.html", {"request": request, "status_code": 500, "detail": exc.detail}, status_code=500
     )
 
 

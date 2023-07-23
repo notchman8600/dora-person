@@ -29,7 +29,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 CLIENT_ID = os.getenv("CLIENT_ID")  # Set your GitHub App's Client ID here
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")  # Set your GitHub App's Client Secret here
 REDIRECT_URL = os.getenv("REDIRECT_URL")  # Set your redirect URL here
-SECRET_KEY = os.environ.get("SECRET_KEY", "NOTCH_MAN_")
+SECRET_KEY = os.environ.get("SECRET_KEY", "NOTCH_MAN_IS_GOD")
 ALGORITHM = "HS256"
 MOCK_USER_ID = "mock_user_id"
 
@@ -163,6 +163,28 @@ class DoraRouter:
                 raise HTTPException(status_code=401, detail="Unauthorized")
 
             err = self.dora_controller.store_vote_count(github_id, target_user_id)
+            if err is not None:
+                raise HTTPException(status_code=500, detail="Internal Server Error")
+            return RedirectResponse(url="/vote", status_code=303)
+
+        @self.dora_router.get("/reset")
+        async def store_access_count(request: Request):
+            try:
+                token_str = request.cookies.get("access_token")
+                if token_str is None:
+                    raise HTTPException(status_code=400, detail="Bad Request")
+                split_cookie = token_str.split(" ")
+                if len(split_cookie) != 2:
+                    raise HTTPException(status_code=401, detail="Unauthorized")
+                token = split_cookie[1]
+                payload = decode(token, SECRET_KEY, algorithms=["HS256"])
+                github_id: str = payload.get("github_name")
+                if github_id == "notchman8600":
+                    raise HTTPException(status_code=403, detail="君にその権限はない")
+            except PyJWTError:
+                raise HTTPException(status_code=401, detail="Unauthorized")
+
+            err = self.dora_controller.reset_count()
             if err is not None:
                 raise HTTPException(status_code=500, detail="Internal Server Error")
             return RedirectResponse(url="/vote", status_code=303)
