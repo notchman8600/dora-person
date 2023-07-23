@@ -1,0 +1,22 @@
+services:
+  web:
+    image: nginx:stable
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./web/nginx.prod.conf:/etc/nginx/nginx.conf
+      - socket:/var/tmp
+      - ./html:/usr/share/nginx/html
+      - ./letsencrypt:/etc/letsencrypt
+    depends_on:
+      - app
+  certbot:
+    image: certbot/certbot:v1.7.0
+    volumes:
+      - ./html:/usr/share/nginx/html
+      - ./letsencrypt:/etc/letsencrypt
+      - ./log_letsencrypt:/var/log/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    restart: always
+

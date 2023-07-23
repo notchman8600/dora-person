@@ -1,9 +1,9 @@
 # Standard Library
 import os
-from http.client import HTTPException
 
 # Third Party Library
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -37,7 +37,9 @@ async def universal_exception_handler(request: Request, exc: Exception):
 @app.exception_handler(HTTPException)
 async def custom_http_exception_handler(request: Request, exc: HTTPException):
     # TODO: 本当はここでロギングを行なう
-
+    # 認証エラー時はログインページへリダイレクト
+    if exc.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(url="/login")
     return templates.TemplateResponse(
         "error.jinja2.html", {"request": request, "status_code": 500, "detail": exc.args}, status_code=500
     )
