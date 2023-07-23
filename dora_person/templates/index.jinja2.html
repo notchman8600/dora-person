@@ -1,0 +1,28 @@
+{% extends 'base.jinja2.html' %} {% block content %}
+<div class="container mt-5">
+  <h1>令和に蘇りし銅鑼パーソン</h1>
+  <p>
+    このサイトはenPiT2023夏合宿向けに制作したWebサイトです。銅鑼を叩きたい人を投票で決定できるシステムです。利用にはGitHubのアカウントが必要です。
+  </p>
+  <button
+    type="button"
+    class="btn btn-primary"
+    onclick="location.href='/login'"
+  >
+    GitHubでログイン
+  </button>
+  <br />
+  <br />
+  <h2>関連リンク</h2>
+  <ul>
+    <li>
+      <a href="https://github.com/notchman8600/dora-person"
+        >GitHubのリポジトリ</a
+      >
+    </li>
+    <li>
+      <a href="https://github.com/notchman8600/resume/">職務経歴書</a>
+    </li>
+  </ul>
+</div>
+{% endblock %}

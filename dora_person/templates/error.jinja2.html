@@ -1,0 +1,20 @@
+{% extends 'base.jinja2.html' %} {% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="error-template">
+        <h1>エラーが発生しました</h1>
+        <div class="error-details">{{ detail }}</div>
+      </div>
+    </div>
+  </div>
+  <p>5秒後にトップページにリダイレクトします...</p>
+</div>
+
+<script>
+  setTimeout(function () {
+    window.location.href = "/vote";
+  }, 5000);
+</script>
+{% endblock %}
