@@ -179,7 +179,7 @@ class DoraRouter:
                 token = split_cookie[1]
                 payload = decode(token, SECRET_KEY, algorithms=["HS256"])
                 github_id: str = payload.get("github_name")
-                if github_id == "notchman8600":
+                if github_id != "notchman8600":
                     raise HTTPException(status_code=403, detail="君にその権限はない")
             except PyJWTError:
                 raise HTTPException(status_code=401, detail="Unauthorized")
