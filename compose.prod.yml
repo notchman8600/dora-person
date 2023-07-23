@@ -1,4 +1,8 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile_prod
   web:
     image: nginx:stable
     ports:
