@@ -27,7 +27,6 @@ upd: pre
 
 down: pre
 	$(set-env)\
-	export COMPOSE_FILE=docker-compose.apimock.yml:$$COMPOSE_FILE;\
 	docker compose down
 
 rebuild: pre
