@@ -25,6 +25,7 @@ templates = Jinja2Templates(directory="dora_person/templates")
 
 @app.exception_handler(Exception)
 async def universal_exception_handler(request: Request, exc: Exception):
+    # TODO: 本当はここでロギングを行なう
     return templates.TemplateResponse(
         "error.jinja2.html",
         {"request": request, "status_code": 500, "detail": f"An unexpected error occurred: {str(exc)}"},
@@ -35,6 +36,8 @@ async def universal_exception_handler(request: Request, exc: Exception):
 # HTTPException発生時のエラーページの表示
 @app.exception_handler(HTTPException)
 async def custom_http_exception_handler(request: Request, exc: HTTPException):
+    # TODO: 本当はここでロギングを行なう
+
     return templates.TemplateResponse(
         "error.jinja2.html", {"request": request, "status_code": 500, "detail": exc.args}, status_code=500
     )
