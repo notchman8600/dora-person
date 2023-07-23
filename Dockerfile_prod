@@ -28,4 +28,4 @@ RUN apt update \
     USER="python"
 
 WORKDIR /usr/src/app
-CMD ["hypercorn", "-b", "unix:/var/tmp/hypercorn.sock", "-w","4", "dora_person.main:app","--reload"]
+CMD ["hypercorn", "-b", "unix:/var/tmp/hypercorn.sock", "-w","8", "dora_person.main:app","--reload"]
