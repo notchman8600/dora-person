@@ -10,7 +10,7 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2AuthorizationCodeBearer, OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from fastapi_login import LoginManager
-from jwt import PyJWTError, decode, encode
+from jwt import ExpiredSignatureError, PyJWTError, decode, encode
 
 # First Party Library
 from dora_person.controller import DoraController
@@ -57,7 +57,7 @@ class DoraRouter:
             user_id: str = payload.get("github_id")
             if user_id is None:
                 raise credentials_exception
-        except jwt.ExpiredSignatureError:
+        except ExpiredSignatureError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Access token is expired",
@@ -117,7 +117,12 @@ class DoraRouter:
                 payload = decode(token, SECRET_KEY, algorithms=["HS256"])
                 name = payload.get("github_name")
                 dora_persons = self.dora_controller.get_dora_person_candidates()
-
+            except ExpiredSignatureError:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Access token is expired",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
             except PyJWTError:
                 raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -139,6 +144,12 @@ class DoraRouter:
                 payload = decode(token, SECRET_KEY, algorithms=["HS256"])
                 github_id: str = payload.get("github_name")
                 avatar_url: str = payload.get("avatar_url")
+            except ExpiredSignatureError:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Access token is expired",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
             except PyJWTError:
                 raise HTTPException(status_code=401, detail="Unauthorized")
             request_dto = SubmitDoraPersonRequestDto(name=github_id, message=message, avatar_url=avatar_url)
@@ -159,6 +170,12 @@ class DoraRouter:
                 token = split_cookie[1]
                 payload = decode(token, SECRET_KEY, algorithms=["HS256"])
                 github_id: str = payload.get("github_name")
+            except ExpiredSignatureError:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Access token is expired",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
             except PyJWTError:
                 raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -181,6 +198,12 @@ class DoraRouter:
                 github_id: str = payload.get("github_name")
                 if github_id != "notchman8600":
                     raise HTTPException(status_code=403, detail="君にその権限はない")
+            except ExpiredSignatureError:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Access token is expired",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
             except PyJWTError:
                 raise HTTPException(status_code=401, detail="Unauthorized")
 
