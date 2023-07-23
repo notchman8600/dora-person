@@ -148,7 +148,7 @@ class DoraRouter:
             return RedirectResponse(url="/vote", status_code=303)
 
         @self.dora_router.post("/vote")
-        async def store_access_count(request: Request, target_user_id: str = Form(...)):
+        async def store_vote_count(request: Request, target_user_id: str = Form(...)):
             try:
                 token_str = request.cookies.get("access_token")
                 if token_str is None:
@@ -168,7 +168,7 @@ class DoraRouter:
             return RedirectResponse(url="/vote", status_code=303)
 
         @self.dora_router.get("/reset")
-        async def store_access_count(request: Request):
+        async def reset_vote_count(request: Request):
             try:
                 token_str = request.cookies.get("access_token")
                 if token_str is None:
