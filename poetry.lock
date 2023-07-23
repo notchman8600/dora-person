@@ -786,6 +786,34 @@ gssapi = ["gssapi (>=1.6.9,<=1.8.2)"]
 opentelemetry = ["Deprecated (>=1.2.6)", "typing-extensions (>=3.7.4)", "zipp (>=0.5)"]
 
 [[package]]
+name = "newrelic"
+version = "8.8.1"
+description = "New Relic Python Agent"
+category = "main"
+optional = false
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*"
+files = [
+    {file = "newrelic-8.8.1-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:4e82a095d8136ac6df10a702ac0c293d97a2a7beddf899c8ecc55564d0f02c0a"},
+    {file = "newrelic-8.8.1-cp27-cp27m-manylinux2010_x86_64.whl", hash = "sha256:659d880fe7b44cc8974b40e796b612f1719f33d315093893e49ba9aec16ad8b1"},
+    {file = "newrelic-8.8.1-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:418a29b20972413f8839aa5b77fa485d71bd897f1257ff05d86a1496d10b75de"},
+    {file = "newrelic-8.8.1-cp27-cp27mu-manylinux2010_x86_64.whl", hash = "sha256:dba619d7b654b01ab5742e059096788b54d8b3dfac14a32c46f00151b848ee6c"},
+    {file = "newrelic-8.8.1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1996ed51f92366f5ba9ad4992687aaca4d0bb3541e239ef4a40e0ae5da6939fc"},
+    {file = "newrelic-8.8.1-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8979eb30019c4d0568842f0d8c17f3616fc8631a57b9ca67ebe1e61cee55c7bd"},
+    {file = "newrelic-8.8.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:de28d2113ac7a499e54f710d6b7bbcc338c02513f70a166ddceb23b45d752a03"},
+    {file = "newrelic-8.8.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3b66123c5f542d29c7f2e6ed9ab92327fb9b6f857f4a635d5a5c530eb5a0c3a7"},
+    {file = "newrelic-8.8.1-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:8f801a8fa30453c421747420232e56533a4c88c066eb14f852f34a757d1595f4"},
+    {file = "newrelic-8.8.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a370283955065a1a55ac85ff97bd97e87144325732dd1ab87bf99a1617a3ecdc"},
+    {file = "newrelic-8.8.1-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:bcbdf28cdd07bf593942b9de076258ed0fe8b5bc85583bdece64ae136e53035f"},
+    {file = "newrelic-8.8.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9603b69eb75f9aecb6246d95c7eeb1f8d41d5c4f34feb5aa0400548eb03b9d3b"},
+    {file = "newrelic-8.8.1-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:880c38f65645f681ea66e18613178b8df96b8fa8873a0b4da4d4076cab738363"},
+    {file = "newrelic-8.8.1-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ba87bac65018c6015cb778ff3a6806949879b2ae42f79b405a32e13177e11b13"},
+    {file = "newrelic-8.8.1.tar.gz", hash = "sha256:ff9f8977a1a0e9a03c50d43e6eb94135da77c2ab9c00723cd1bf689c5685e4b0"},
+]
+
+[package.extras]
+infinite-tracing = ["grpcio", "protobuf"]
+
+[[package]]
 name = "outcome"
 version = "1.2.0"
 description = "Capture the outcome of Python function calls."
@@ -1242,4 +1270,4 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "a9c0cc8fbbaefb7da6a9acd06284ae030664fc32d135c0d4fb17146fb5997bed"
+content-hash = "57f2c2471903d5f8e99b6f755f4f578721cfa60ad3f7766cf65f655ad4dbe8c5"
