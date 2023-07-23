@@ -1,9 +1,10 @@
 # Standard Library
+import datetime
 import os
 
 # Third Party Library
 import httpx
-from fastapi import Depends, Form, HTTPException, Request, Response
+from fastapi import Depends, Form, HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2AuthorizationCodeBearer, OAuth2PasswordBearer
@@ -56,6 +57,12 @@ class DoraRouter:
             user_id: str = payload.get("github_id")
             if user_id is None:
                 raise credentials_exception
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Access token is expired",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         except PyJWTError:
             raise credentials_exception
         if os.getenv("DEVELOPMENT"):
@@ -86,14 +93,9 @@ class DoraRouter:
                     raise HTTPException(status_code=400, detail=rj["error"])
                 access_token = rj["access_token"]
             user = await self.dora_controller.get_user_detail(access_token)
-
+            expire = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
             token = encode(
-                {
-                    "github_id": user.user_id,
-                    "avatar_url": user.avatar_url,
-                    "github_name": user.user_name,
-                    "access_token": access_token,
-                },
+                {"github_id": user.user_id, "avatar_url": user.avatar_url, "github_name": user.user_name, "exp": expire},
                 SECRET_KEY,
                 algorithm="HS256",
             )
