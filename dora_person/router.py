@@ -3,7 +3,7 @@ import os
 
 # Third Party Library
 import httpx
-from fastapi import Depends, HTTPException, Request, Response
+from fastapi import Depends, Form, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2AuthorizationCodeBearer, OAuth2PasswordBearer
@@ -13,6 +13,7 @@ from jwt import PyJWTError, decode, encode
 
 # First Party Library
 from dora_person.controller import DoraController
+from dora_person.request import SubmitDoraPersonRequestDto
 
 oauth_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl="https://github.com/login/oauth/authorize",
@@ -73,7 +74,7 @@ class DoraRouter:
             return RedirectResponse(url=github_oauth_url)
 
         @self.dora_router.get("/auth")
-        async def auth(request: Request, response: Response, code: str = ""):
+        async def auth(request: Request, code: str = ""):
             if code == "":
                 raise HTTPException(status_code=401, detail="Unauthorized")
             data = {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET, "code": code}
@@ -84,12 +85,21 @@ class DoraRouter:
                 if "error" in rj:
                     raise HTTPException(status_code=400, detail=rj["error"])
                 access_token = rj["access_token"]
-                r = await client.get("https://api.github.com/user", headers={"Authorization": f"token {access_token}"})
-            user = r.json()
+            user = await self.dora_controller.get_user_detail(access_token)
 
-            token = encode({"github_id": user["id"], "access_token": access_token}, SECRET_KEY, algorithm="HS256")
+            token = encode(
+                {
+                    "github_id": user.user_id,
+                    "avatar_url": user.avatar_url,
+                    "github_name": user.user_name,
+                    "access_token": access_token,
+                },
+                SECRET_KEY,
+                algorithm="HS256",
+            )
+            response = self.templates.TemplateResponse("auth.jinja2.html", {"request": request})
             response.set_cookie(key="access_token", value=f"Bearer {token}")
-            return {"message": "authentication success"}
+            return response
 
         @self.dora_router.get("/vote")
         async def vote_page(request: Request):
@@ -103,25 +113,58 @@ class DoraRouter:
                     raise HTTPException(status_code=401, detail="Unauthorized")
                 token = split_cookie[1]
                 payload = decode(token, SECRET_KEY, algorithms=["HS256"])
-                github_id = payload.get("github_id")
-                access_token = payload.get("access_token")
+                name = payload.get("github_name")
+                dora_persons = self.dora_controller.get_dora_person_candidates()
+
             except PyJWTError:
                 raise HTTPException(status_code=401, detail="Unauthorized")
-            user_data = await self.dora_controller.get_user_detail(github_id, access_token)
-            return self.templates.TemplateResponse("vote.jinja2.html", {"request": request, "github_id": user_data.user_name})
 
-        @self.dora_router.post("/vote/{target_user_id}")
-        async def store_access_count(request: Request, target_user_id: str = ""):
+            return self.templates.TemplateResponse(
+                "vote.jinja2.html", {"request": request, "github_id": name, "dora_persons": dora_persons}
+            )
+
+        @self.dora_router.post("/submit")
+        async def submit_dora_person(request: Request, response: Response, message: str = Form(...)):
             try:
-                token = request.cookies.get("access_token")
+                token_str = request.cookies.get("access_token")
+                if token_str is None:
+                    raise HTTPException(status_code=400, detail="Bad Request")
+
+                split_cookie = token_str.split(" ")
+                if len(split_cookie) != 2:
+                    raise HTTPException(status_code=401, detail="Unauthorized")
+                token = split_cookie[1]
                 payload = decode(token, SECRET_KEY, algorithms=["HS256"])
-                github_id = payload.get("github_id")
+                github_id: str = payload.get("github_name")
+                avatar_url: str = payload.get("avatar_url")
+            except PyJWTError:
+                raise HTTPException(status_code=401, detail="Unauthorized")
+            request_dto = SubmitDoraPersonRequestDto(name=github_id, message=message, avatar_url=avatar_url)
+            # POSTリクエストなので303でGETリダイレクトにする
+            err = self.dora_controller.submit_dora_person(request_dto)
+            if err is not None:
+                raise HTTPException(status_code=500, detail="Internal Server Error")
+            return RedirectResponse(url="/vote", status_code=303)
+
+        @self.dora_router.post("/vote")
+        async def store_access_count(request: Request, target_user_id: str = Form(...)):
+            try:
+                token_str = request.cookies.get("access_token")
+                if token_str is None:
+                    raise HTTPException(status_code=400, detail="Bad Request")
+                split_cookie = token_str.split(" ")
+                if len(split_cookie) != 2:
+                    raise HTTPException(status_code=401, detail="Unauthorized")
+                token = split_cookie[1]
+                payload = decode(token, SECRET_KEY, algorithms=["HS256"])
+                github_id: str = payload.get("github_name")
             except PyJWTError:
                 raise HTTPException(status_code=401, detail="Unauthorized")
 
-            self.dora_controller.count_store(github_id, target_user_id)
-
-        return True
+            err = self.dora_controller.store_vote_count(github_id, target_user_id)
+            if err != None:
+                raise HTTPException(status_code=500, detail="Internal Server Error")
+            return RedirectResponse(url="/vote", status_code=303)
 
     def get_instance(self) -> APIRouter:
         return self.dora_router

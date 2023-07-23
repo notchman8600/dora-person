@@ -1,0 +1,10 @@
+{% extends 'base.jinja2.html' %} {% block content %}
+
+<h2>認証に成功しました。投票ページにリダイレクトします...</h2>
+<script>
+  setTimeout(function () {
+    window.location.href = "/vote";
+  }, 1000);
+</script>
+
+{% endblock %}

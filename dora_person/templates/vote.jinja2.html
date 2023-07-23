@@ -1,10 +1,29 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Vote Page</title>
-  </head>
-  <body>
-    <h1>Welcome to your dashboard!</h1>
-    <p>Your GitHub ID: {{ github_id }}</p>
-  </body>
-</html>
+{% extends 'base.jinja2.html' %} {% block content %}
+<div class="container mt-5">
+  <h1>銅鑼を叩かせたい人に投票しよう</h1>
+  <p>Your GitHub ID: {{ github_id }}</p>
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for dora_person in dora_persons %} {% include
+    "dora.components.jinja2.html"%} {% endfor %}
+  </div>
+  <br />
+  <h2>銅鑼パーソンに立候補する</h2>
+  <form action="/submit" method="POST">
+    <div class="form-group">
+      <div class="mb-3">
+        <label class="form-label" for="message" accept-charset="UTF-8"
+          >意気込みをどうぞ！</label
+        >
+        <input
+          type="text"
+          class="form-control"
+          id="message"
+          name="message"
+          placeholder="威勢の良いコメントをどうぞ！"
+        />
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">銅鑼パーソンになる</button>
+  </form>
+</div>
+{% endblock %}

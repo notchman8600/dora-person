@@ -10,6 +10,8 @@ services:
     depends_on:
       redis:
         condition: service_started
+      mysql:
+        condition: service_started
   redis:
     image: "redis:alpine"
   web:
@@ -21,5 +23,17 @@ services:
       - socket:/var/tmp
     depends_on:
       - app
+  mysql:
+    image: mysql
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./initdb.d:/docker-entrypoint-initdb.d/
+    environment:
+      MYSQL_ROOT_PASSWORD: dora_root_pw
+      MYSQL_DATABASE: dora_person
+    cap_add:
+      - SYS_NICE
+
 volumes:
   socket:
+  db_data:

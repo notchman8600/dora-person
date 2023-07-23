@@ -47,11 +47,13 @@ max-line-length = 128
 fastapi = "^0.100.0"
 fastapi-login = "^1.9.0"
 httpx = "^0.24.1"
+hypercorn = "^0.14.4"
+jinja2 = "^3.1.2"
 pyjwt = "^2.7.0"
 python = "^3.11"
 redis = "^4.6.0"
-hypercorn = "^0.14.4"
-jinja2 = "^3.1.2"
+mysql-connector-python = "^8.1.0"
+python-multipart = "^0.0.6"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "^2.1.1"
