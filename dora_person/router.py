@@ -4,10 +4,9 @@ import os
 
 # Third Party Library
 import httpx
-from fastapi import Depends, Form, HTTPException, Request, Response, status
+from fastapi import Form, HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse
 from fastapi.routing import APIRouter
-from fastapi.security import OAuth2AuthorizationCodeBearer, OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from fastapi_login import LoginManager
 from jwt import ExpiredSignatureError, PyJWTError, decode, encode
@@ -16,22 +15,11 @@ from jwt import ExpiredSignatureError, PyJWTError, decode, encode
 from dora_person.controller import DoraController
 from dora_person.request import SubmitDoraPersonRequestDto
 
-oauth_scheme = OAuth2AuthorizationCodeBearer(
-    authorizationUrl="https://github.com/login/oauth/authorize",
-    tokenUrl="https://github.com/login/oauth/access_token",
-    refreshUrl="https://github.com/login/oauth/access_token",
-    scopes={"user:email": "Read user email"},
-)
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
-
-
 CLIENT_ID = os.getenv("CLIENT_ID")  # Set your GitHub App's Client ID here
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")  # Set your GitHub App's Client Secret here
 REDIRECT_URL = os.getenv("REDIRECT_URL")  # Set your redirect URL here
 SECRET_KEY = os.environ.get("SECRET_KEY", "NOTCH_MAN_IS_GOD")
 ALGORITHM = "HS256"
-MOCK_USER_ID = "mock_user_id"
 
 
 class DoraRouter:
@@ -45,29 +33,6 @@ class DoraRouter:
         self.templates = templates
         self.dora_controller = dora_controller
         self.__init_route()
-
-    async def get_current_user(self, token: str = Depends(oauth2_scheme)) -> dict[str, str]:
-        credentials_exception = HTTPException(
-            status_code=401,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-        try:
-            payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            user_id: str = payload.get("github_id")
-            if user_id is None:
-                raise credentials_exception
-        except ExpiredSignatureError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Access token is expired",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        except PyJWTError:
-            raise credentials_exception
-        if os.getenv("DEVELOPMENT"):
-            return {"user_id": MOCK_USER_ID}
-        return {"user_id": user_id}
 
     def __init_route(self) -> bool:
         # トップページ
@@ -114,7 +79,7 @@ class DoraRouter:
                 if len(split_cookie) != 2:
                     raise HTTPException(status_code=401, detail="Unauthorized")
                 token = split_cookie[1]
-                payload = decode(token, SECRET_KEY, algorithms=["HS256"])
+                payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
                 name = payload.get("github_name")
                 dora_persons = self.dora_controller.get_dora_person_candidates()
             except ExpiredSignatureError:
@@ -141,7 +106,7 @@ class DoraRouter:
                 if len(split_cookie) != 2:
                     raise HTTPException(status_code=401, detail="Unauthorized")
                 token = split_cookie[1]
-                payload = decode(token, SECRET_KEY, algorithms=["HS256"])
+                payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
                 github_id: str = payload.get("github_name")
                 avatar_url: str = payload.get("avatar_url")
             except ExpiredSignatureError:
@@ -168,7 +133,7 @@ class DoraRouter:
                 if len(split_cookie) != 2:
                     raise HTTPException(status_code=401, detail="Unauthorized")
                 token = split_cookie[1]
-                payload = decode(token, SECRET_KEY, algorithms=["HS256"])
+                payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
                 github_id: str = payload.get("github_name")
             except ExpiredSignatureError:
                 raise HTTPException(
@@ -194,7 +159,7 @@ class DoraRouter:
                 if len(split_cookie) != 2:
                     raise HTTPException(status_code=401, detail="Unauthorized")
                 token = split_cookie[1]
-                payload = decode(token, SECRET_KEY, algorithms=["HS256"])
+                payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
                 github_id: str = payload.get("github_name")
                 if github_id != "notchman8600":
                     raise HTTPException(status_code=403, detail="君にその権限はない")
