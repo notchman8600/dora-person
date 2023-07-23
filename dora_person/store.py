@@ -19,8 +19,13 @@ class AccessCountStore:
         r = redis.Redis(host=self.redis_url, port=6379, db=0)
         key = f"{target_user_id}:{request_user_id}"
         b_count = r.get(key)
+        # キーが存在しないときはNoneとなるので0を代入する
+        if b_count is None:
+            b_count = 0
+        # bytes -> int
+        b_count = int(b_count)
         r.incr(key)
-        a_count = r.get(key)
+        a_count = int(r.get(key))
         if b_count == a_count:
             return Error(code=500, message="failed to count record")
 

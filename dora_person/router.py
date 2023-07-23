@@ -39,9 +39,9 @@ class DoraRouter:
     templates: Jinja2Templates
     manager: LoginManager
 
-    def __init__(self, dora_controller: DoraController) -> None:
+    def __init__(self, templates: Jinja2Templates, dora_controller: DoraController) -> None:
         self.dora_router = APIRouter(prefix="", tags=["dora"])
-        self.templates = Jinja2Templates(directory="dora_person/templates")
+        self.templates = templates
         self.dora_controller = dora_controller
         self.__init_route()
 
@@ -140,7 +140,6 @@ class DoraRouter:
             except PyJWTError:
                 raise HTTPException(status_code=401, detail="Unauthorized")
             request_dto = SubmitDoraPersonRequestDto(name=github_id, message=message, avatar_url=avatar_url)
-            # POSTリクエストなので303でGETリダイレクトにする
             err = self.dora_controller.submit_dora_person(request_dto)
             if err is not None:
                 raise HTTPException(status_code=500, detail="Internal Server Error")
@@ -162,7 +161,7 @@ class DoraRouter:
                 raise HTTPException(status_code=401, detail="Unauthorized")
 
             err = self.dora_controller.store_vote_count(github_id, target_user_id)
-            if err != None:
+            if err is not None:
                 raise HTTPException(status_code=500, detail="Internal Server Error")
             return RedirectResponse(url="/vote", status_code=303)
 
