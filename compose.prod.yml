@@ -1,4 +1,30 @@
 services:
+  app:
+    build:
+      context: .
+    env_file:
+      - ./.env.local
+    volumes:
+      - ./dora_person:/usr/src/app/dora_person
+      - socket:/var/tmp
+    depends_on:
+      redis:
+        condition: service_started
+      mysql:
+        condition: service_started
+  redis:
+    image: "redis:alpine"
+
+  mysql:
+    image: mysql
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./initdb.d:/docker-entrypoint-initdb.d/
+    environment:
+      MYSQL_ROOT_PASSWORD: dora_root_pw
+      MYSQL_DATABASE: dora_person
+    cap_add:
+      - SYS_NICE
   web:
     image: nginx:stable
     ports:
@@ -20,3 +46,6 @@ services:
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     restart: always
 
+volumes:
+  socket:
+  db_data:

@@ -14,7 +14,7 @@ endif
 ifeq ($(MODE),prod)
 set-env := export MODE=$(MODE) ;\
 	export COMPOSE_PATH_SEPARATOR=: ;\
-	export COMPOSE_FILE=compose.yml:compose.$(MODE).yml;
+	export COMPOSE_FILE=compose.$(MODE).yml;
 endif
 
 up: pre
