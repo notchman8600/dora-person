@@ -58,7 +58,7 @@ class DoraRouter:
                     raise HTTPException(status_code=400, detail=rj["error"])
                 access_token = rj["access_token"]
             user = await self.dora_controller.get_user_detail(access_token)
-            expire = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
+            expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=15)
             token = encode(
                 {"github_id": user.user_id, "avatar_url": user.avatar_url, "github_name": user.user_name, "exp": expire},
                 SECRET_KEY,

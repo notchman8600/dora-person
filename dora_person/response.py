@@ -11,7 +11,6 @@ class GitHubProfileDto:
         self.user_id = user_id
         self.user_name = user_name
         self.avatar_url = quote(avatar_url)
-        pass
 
 
 class DoraPersonDto:
@@ -25,4 +24,3 @@ class DoraPersonDto:
         self.message = message
         self.avatar_url = avatar_url
         self.count = count
-        pass
