@@ -1,8 +1,8 @@
-# Standard Library
+"""A pooled MySQL connector that reconnects stale pooled connections."""
+
 import queue
 import threading
 
-# Third Party Library
 from mysql.connector.errors import InterfaceError, PoolError
 from mysql.connector.pooling import MySQLConnectionPool, PooledMySQLConnection
 
@@ -17,10 +17,10 @@ class SafeMySQLPoolingConnector(MySQLConnectionPool):
         port: str,
         pool_name: str,
         pool_size: int = 10,
-        pool_reset_session=True,
-        block=True,
-        timeout=0,
-    ):
+        pool_reset_session: bool = True,
+        block: bool = True,
+        timeout: int = 0,
+    ) -> None:
         self.host = host
         self.user = user
         self.password = password
@@ -39,7 +39,7 @@ class SafeMySQLPoolingConnector(MySQLConnectionPool):
             port=self.port,
         )
 
-    def get_connection(self):
+    def get_connection(self) -> PooledMySQLConnection:
         with threading.RLock():
             try:
                 cnx = self._cnx_queue.get(block=self.block, timeout=self.timeout)
