@@ -1,8 +1,18 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile_prod
+    # Wrap the ASGI server with the New Relic agent and use more workers in prod.
+    # The image is the same as dev (see Dockerfile); only the runtime command differs.
+    environment:
+      NEW_RELIC_CONFIG_FILE: /usr/src/app/newrelic/newrelic.ini
+    command:
+      - newrelic-admin
+      - run-program
+      - hypercorn
+      - -b
+      - unix:/var/tmp/hypercorn.sock
+      - -w
+      - "8"
+      - dora_person.main:app
   web:
     image: nginx:stable
     ports:
@@ -23,4 +33,3 @@ services:
       - ./log_letsencrypt:/var/log/letsencrypt
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     restart: always
-
